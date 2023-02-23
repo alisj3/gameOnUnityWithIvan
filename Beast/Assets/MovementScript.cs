@@ -8,6 +8,7 @@ public class MovementScript : MonoBehaviour
     private float speed = 8f;
     private bool isFacingRight = true;
     private bool inAir; // Статус inAir для проверки, находится ли персонаж в воздухе
+    public Animator animator; // Добавляем "Аниматора"
 
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck ;
@@ -19,9 +20,12 @@ public class MovementScript : MonoBehaviour
             float jumpVelocity = 7f;
             rb.velocity = Vector2.up * jumpVelocity;
             inAir = true; // Меняет статус inAir, чтобы персонаж не прыгал в воздухе
+            animator.SetBool("inAir", inAir); // Задаём параметру анимации inAir значение true
         }
 
         horizontal = Input.GetAxisRaw("Horizontal");
+
+        animator.SetFloat("Speed", Mathf.Abs(horizontal)); // Задаём параметру анимации Speed значение больше 0 
 
         Flip();
     }
@@ -32,6 +36,7 @@ public class MovementScript : MonoBehaviour
         if (other.gameObject.CompareTag("Ground")) // Если персонаж на земле, то статус inAir меняется
         {
             inAir = false;
+            animator.SetBool("inAir", inAir); // Задаём параметру анимации inAir значение false
         }
     }
 

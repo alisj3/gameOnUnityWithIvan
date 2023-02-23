@@ -7,7 +7,6 @@ public class MovementScript : MonoBehaviour
     private float horizontal;
     private float speed = 8f;
     private bool isFacingRight = true;
-    private bool inAir; // Статус inAir для проверки, находится ли персонаж в воздухе
     public Animator animator; // Добавляем "Аниматора"
 
     [SerializeField] private Rigidbody2D rb;
@@ -15,12 +14,22 @@ public class MovementScript : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && !inAir)
+        if (Input.GetKeyDown(KeyCode.Space) && rb.velocity.y == 0)
         {
             float jumpVelocity = 7f;
             rb.velocity = Vector2.up * jumpVelocity;
-            inAir = true; // Меняет статус inAir, чтобы персонаж не прыгал в воздухе
-            animator.SetBool("inAir", inAir); // Задаём параметру анимации inAir значение true
+            animator.SetBool("Jumping", true); // Задаём параметру анимации Jumping значение true
+        }
+
+        if (rb.velocity.y < 0)
+        {
+            animator.SetBool("Jumping", false);
+            animator.SetBool("Falling", true);
+        }
+
+        if (rb.velocity.y == 0)
+        {
+            animator.SetBool("Falling", false);
         }
 
         horizontal = Input.GetAxisRaw("Horizontal");
@@ -30,13 +39,12 @@ public class MovementScript : MonoBehaviour
         Flip();
     }
 
-
+    
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Ground")) // Если персонаж на земле, то статус inAir меняется
+        if (other.gameObject.CompareTag("Ground"))
         {
-            inAir = false;
-            animator.SetBool("inAir", inAir); // Задаём параметру анимации inAir значение false
+            animator.SetBool("Jumping", false); // Задаём параметру анимации Jumping значение false
         }
     }
 

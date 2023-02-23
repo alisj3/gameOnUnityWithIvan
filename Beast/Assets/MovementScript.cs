@@ -6,22 +6,33 @@ public class MovementScript : MonoBehaviour
 {
     private float horizontal;
     private float speed = 8f;
-    private bool isFacibgRight = true;
+    private bool isFacingRight = true;
+    private bool inAir; // Статус inAir для проверки, находится ли персонаж в воздухе
 
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck ;
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !inAir)
         {
             float jumpVelocity = 7f;
             rb.velocity = Vector2.up * jumpVelocity;
+            inAir = true; // Меняет статус inAir, чтобы персонаж не прыгал в воздухе
         }
 
         horizontal = Input.GetAxisRaw("Horizontal");
 
         Flip();
+    }
+
+
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Ground")) // Если персонаж на земле, то статус inAir меняется
+        {
+            inAir = false;
+        }
     }
 
     private void FixedUpdate()
@@ -31,9 +42,9 @@ public class MovementScript : MonoBehaviour
 
     private void Flip()
     {
-        if(isFacibgRight && horizontal < 0f || !isFacibgRight && horizontal > 0f)
+        if(isFacingRight && horizontal < 0f || !isFacingRight && horizontal > 0f)
         {
-            isFacibgRight = !isFacibgRight;
+            isFacingRight = !isFacingRight;
             Vector3 localScale = transform.localScale;
             localScale.x *= -1f;
             transform.localScale = localScale;
